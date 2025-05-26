@@ -1,0 +1,32 @@
+# Ambiente virtuale
+.venv/
+env/
+venv/
+
+# File temporanei di sistema
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# File audio convertiti (output)
+*.mp3
+*.webm
+
+# Log ed errori
+*.log
+
+# File temporanei di editor
+*.swp
+*.swo
+*~
+
+# VSCode settings
+.vscode/
