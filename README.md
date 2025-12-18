@@ -6,6 +6,19 @@
 
 ---
 
+## ⚠️ Avviso legale / Disclaimer
+
+Questo progetto è fornito **solo a scopo didattico e di studio**.
+
+- L’utente è **l’unico responsabile** dell’utilizzo del software e dei contenuti scaricati/convertiti.
+- Gli autori e i contributori **non si assumono alcuna responsabilità legale** per eventuali usi impropri, violazioni di copyright, o violazioni dei termini di servizio di piattaforme terze.
+- Utilizza questo software **solo** per contenuti di cui possiedi i diritti, per contenuti rilasciati con licenze che ne consentano il download/riuso, o dove hai esplicita autorizzazione.
+- In caso di dubbi, **non utilizzare** il software.
+
+L’utilizzo del progetto implica l’accettazione di questo disclaimer.
+
+---
+
 ## 🖥️ Requisiti
 
 - Python 3.9 o superiore
