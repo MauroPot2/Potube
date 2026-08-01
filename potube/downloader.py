@@ -1,39 +1,84 @@
 # potube/downloader.py
 import os
+import shutil
 import subprocess
-import re
-from pytubefix import YouTube
 
 
-def on_progress(stream, chunk, bytes_remaining):
-    total_size = stream.filesize
-    downloaded = total_size - bytes_remaining
-    percent = downloaded / total_size * 100
-    print(f"Download progress: {percent:.2f}%", end='\r')
+SUPPORTED_QUALITIES = {"128", "192", "256", "320"}
 
 
-def download_audio_from_url(url):
-    yt = YouTube(url, on_progress_callback=on_progress)
-    safe_title = re.sub(r'[\\/*?:"<>|]', "", yt.title).strip()
-    print(f"\nTitolo del video: {yt.title}")
+def download_audio_from_url(url, quality="192", playlist=False):
+    if quality not in SUPPORTED_QUALITIES:
+        raise ValueError(
+            f"Qualità non supportata: {quality}. "
+            f"Valori ammessi: {', '.join(sorted(SUPPORTED_QUALITIES))}"
+        )
 
-    audio_file = yt.streams.get_audio_only().download(filename=f"{safe_title}.webm")
-    output_folder = os.path.expanduser("~/Musica")
+    output_folder = os.path.expanduser("~/Music")
     os.makedirs(output_folder, exist_ok=True)
-    mp3_file = os.path.join(output_folder, f"{safe_title}.mp3")
+
+    if playlist:
+        output_template = os.path.join(
+            output_folder,
+            "%(playlist_title)s",
+            "%(playlist_index)02d - %(title)s.%(ext)s",
+        )
+    else:
+        output_template = os.path.join(
+            output_folder,
+            "%(title)s.%(ext)s",
+        )
+
+    yt_dlp_path = shutil.which("yt-dlp")
+    if not yt_dlp_path:
+        print(
+            "\n❌ yt-dlp non è installato."
+            "\nSu macOS installalo con:"
+            "\n\nbrew install yt-dlp"
+        )
+        return 1
+
+    if not shutil.which("ffmpeg"):
+        print(
+            "\n❌ ffmpeg non è installato."
+            "\nSu macOS installalo con:"
+            "\n\nbrew install ffmpeg"
+        )
+        return 1
 
     command = [
-        "ffmpeg",
-        "-i", audio_file,
-        "-vn",
-        "-acodec", "libmp3lame",
-        "-ar", "44100",
-        "-ac", "2",
-        "-ab", "192k",
-        "-y",
-        mp3_file
+        yt_dlp_path,
+        "--extract-audio",
+        "--audio-format",
+        "mp3",
+        "--audio-quality",
+        f"{quality}K",
+        "--output",
+        output_template,
     ]
 
-    subprocess.run(command)
-    os.remove(audio_file)
-    print(f"\n✅ Salvato in: {mp3_file}")
+    command.append("--yes-playlist" if playlist else "--no-playlist")
+    command.append(url)
+
+    mode = "playlist" if playlist else "brano"
+    print(
+        f"\n🎵 Download {mode} in corso..."
+        f"\n🎚️ Qualità: {quality} kbps\n"
+    )
+
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as error:
+        print(
+            "\n❌ Download non riuscito."
+            f"\nCodice errore: {error.returncode}"
+            "\nVerifica la connessione, disattiva eventuali VPN/proxy "
+            "e riprova."
+        )
+        return error.returncode or 1
+
+    print(
+        "\n✅ Download completato."
+        f"\n📁 File salvato in: {output_folder}"
+    )
+    return 0

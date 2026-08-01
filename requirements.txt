@@ -1,1 +1,2 @@
-pytubefix==9.0.1
+# Nessuna dipendenza Python runtime.
+# Potube usa yt-dlp e ffmpeg installati nel sistema.
