@@ -1,2 +1,0 @@
-# Nessuna dipendenza Python runtime.
-# Potube usa yt-dlp e ffmpeg installati nel sistema.
